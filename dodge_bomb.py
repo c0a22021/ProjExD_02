@@ -1,5 +1,4 @@
 import random
-import time
 import sys
 import pygame as pg
 
@@ -27,9 +26,12 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     yoko, tate = True, True
     if rct.left < 0 or WIDTH < rct.right:  # 横方向はみ出し判定
         yoko = False
+
     if rct.top < 0 or HEIGHT < rct.bottom:  # 縦方向はみ出し判定
         tate = False
+
     return yoko, tate
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -56,16 +58,15 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        num = 0
-
+    
         if kk_rct.colliderect(bb_rct):
             kk_img = kt_img # ぶつかった時に画像を切り替える
             print("Game Over")
             return
             
         key_lst = pg.key.get_pressed()
-        k_ls = pg.key.get_pressed()
         sum_mv = [0, 0]
+
         for k, tpl in delta.items():
             if key_lst[k]:  # キーが押されたら
                 sum_mv[0] += tpl[0]
@@ -73,6 +74,7 @@ def main():
 
         screen.blit(bg_img, [0, 0])
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
+
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
 
