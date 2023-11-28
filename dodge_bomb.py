@@ -5,12 +5,16 @@ import pygame as pg
 
 WIDTH, HEIGHT = 1600, 900
 
+
 delta = {  # 練習3 押下キーによる移動
     pg.K_UP: (0, -5),  # キー: 移動量/値: (横方向移動量, 縦方向移動量)
     pg.K_DOWN: (0, +5),
     pg.K_LEFT: (-5, 0),
     pg.K_RIGHT: (+5, 0)
 }
+
+
+ac = 1.3 #  加速度を増やす変数
 
 
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
@@ -30,11 +34,14 @@ def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("ex02/fig/pg_bg.jpg")
+    kt_img = pg.image.load("ex02/fig/8.png")
     kk_img = pg.image.load("ex02/fig/3.png")
     kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
     kk_rct = kk_img.get_rect() # こうかとんSurfaceを抽出する。
     kk_rct.center = 900, 400 
     bb_img = pg.Surface((20, 20))  # 演習１ 透明のSurfaceを作る
+    kt_rct = kt_img.get_rect()
+    kt_rct.center = 900, 400
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 演習1 赤い半径10の円を描く
     bb_img.set_colorkey((0, 0, 0))  # 黒い部分を透明にする
     bb_rct = bb_img.get_rect()  # 練習2 爆弾SurfaceのRectを抽出する
@@ -43,16 +50,19 @@ def main():
     vx, vy = +5, +5  # 演習2 爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        num = 0
         
         if kk_rct.colliderect(bb_rct):
             print("Game Over")
             return
             
         key_lst = pg.key.get_pressed()
+        k_ls = pg.key.get_pressed()
         sum_mv = [0, 0]
         for k, tpl in delta.items():
             if key_lst[k]:  # キーが押されたら
@@ -63,13 +73,21 @@ def main():
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+
         screen.blit(kk_img, kk_rct)  # こうかとんを移動させる
         bb_rct.move_ip(vx, vy)  # 爆弾を移動させる
         yoko, tate = check_bound(bb_rct)
+
         if not yoko:  # 横方向にはみ出たら
             vx *= -1  
+
         if not tate:  # 縦方向にはみでたら
             vy *= -1
+
+        if tmr % 100 == 0:  # tmrを100で割った余りが0の時に速度をac倍する
+            vx *= ac
+            vy *= ac
+        
         bb_rct.move_ip(vx, vy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
