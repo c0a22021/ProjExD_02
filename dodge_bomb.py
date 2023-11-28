@@ -1,4 +1,5 @@
 import random
+import time
 import sys
 import pygame as pg
 
@@ -34,14 +35,14 @@ def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("ex02/fig/pg_bg.jpg")
-    kt_img = pg.image.load("ex02/fig/8.png")
+    kt_img = pg.image.load("ex02/fig/8.png")  
     kk_img = pg.image.load("ex02/fig/3.png")
-    kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
+    kk_img = pg.transform.rotozoom(kk_img, 10, 2.0)
+    kt_img = pg.transform.rotozoom(kt_img, 10, 2.0)
     kk_rct = kk_img.get_rect() # こうかとんSurfaceを抽出する。
     kk_rct.center = 900, 400 
     bb_img = pg.Surface((20, 20))  # 演習１ 透明のSurfaceを作る
     kt_rct = kt_img.get_rect()
-    kt_rct.center = 900, 400
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 演習1 赤い半径10の円を描く
     bb_img.set_colorkey((0, 0, 0))  # 黒い部分を透明にする
     bb_rct = bb_img.get_rect()  # 練習2 爆弾SurfaceのRectを抽出する
@@ -56,8 +57,9 @@ def main():
             if event.type == pg.QUIT: 
                 return
         num = 0
-        
+
         if kk_rct.colliderect(bb_rct):
+            kk_img = kt_img # ぶつかった時に画像を切り替える
             print("Game Over")
             return
             
