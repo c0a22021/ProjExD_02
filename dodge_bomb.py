@@ -13,6 +13,19 @@ delta = {  # 練習3 押下キーによる移動
 }
 
 
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    オブジェクトが画面内or画面外を判定し、真理値タプルを返す関数
+    引数 rct: こうかとんor爆弾SurfaceのRect
+    戻り値: 横方向、縦方向はみだし判定結果(画面内:True/画面外:False)
+    """
+    yoko, tate = True, True
+    if rct.left < 0 or WIDTH < rct.right:  # 横方向はみ出し判定
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom:  # 縦方向はみ出し判定
+        tate = False
+    return yoko, tate
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -44,7 +57,15 @@ def main():
 
         screen.blit(bg_img, [0, 0])
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)  # こうかとんを移動させる
+        bb_rct.move_ip(vx, vy)  # 爆弾を移動させる
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:  # 横方向にはみ出たら
+            vx *= -1  
+        if not tate:  # 縦方向にはみでたら
+            vy *= -1
         bb_rct.move_ip(vx, vy)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
